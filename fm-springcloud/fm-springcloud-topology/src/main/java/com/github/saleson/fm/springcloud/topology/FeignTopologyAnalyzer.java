@@ -1,6 +1,6 @@
 package com.github.saleson.fm.springcloud.topology;
 
-import com.github.saleson.fm.commons.ClassScaners;
+import com.github.saleson.fm.commons.Scaners;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -26,7 +26,7 @@ public class FeignTopologyAnalyzer implements TopologyAnalyzer {
         ServiceDependent serviceDependent = new ServiceDependent();
         serviceDependent.setName(getServiceName());
 
-        Set<Class<?>> classes = ClassScaners.classScaner().scanByAnnotation(packagePath, FeignClient.class);
+        Set<Class<?>> classes = Scaners.classScaner().scanByAnnotation(packagePath, FeignClient.class);
         classes.forEach(cls -> {
             FeignClient feignClient = AnnotationUtils.findAnnotation(cls, FeignClient.class);
             if (StringUtils.isNotEmpty(feignClient.url())) {
