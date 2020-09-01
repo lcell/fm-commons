@@ -1,17 +1,17 @@
 package com.github.saleson.fm.commons;
 
-import com.github.saleson.fm.clsscaner.ClassScaner;
-import com.github.saleson.fm.clsscaner.SpringClassScaner;
+import com.github.saleson.fm.scanner.ClassScanner;
+import com.github.saleson.fm.scanner.SpringClassScanner;
 
 public class ClassScaners {
 
-    public static ClassScaner classScaner(){
+    public static ClassScanner classScaner(){
         return springClassScaner();
     }
 
 
-    public static ClassScaner springClassScaner(){
-        return new SpringClassScaner();
+    public static ClassScanner springClassScaner(){
+        return new SpringClassScanner();
     }
 
 

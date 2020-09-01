@@ -1,6 +1,5 @@
-package com.github.saleson.fm.clsscaner;
+package com.github.saleson.fm.scanner;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
@@ -12,18 +11,17 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.StringUtils;
 import org.springframework.util.SystemPropertyUtils;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class SpringClassScaner implements ResourceLoaderAware, ClassScaner {
+public class SpringClassScanner implements ResourceLoaderAware, ClassScanner {
 
 	// 保存过滤规则要排除的注解
 	private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
@@ -33,14 +31,52 @@ public class SpringClassScaner implements ResourceLoaderAware, ClassScaner {
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(
 			this.resourcePatternResolver);
 
-	@Override
-	public Set<Class<?>> scan(String[] basePackages, Class<? extends Annotation>... annotations) {
-		SpringClassScaner cs = new SpringClassScaner();
 
-		if (ArrayUtils.isNotEmpty(annotations)) {
-			for (Class<? extends Annotation > anno : annotations) {
-				cs.addIncludeFilter(new AnnotationTypeFilter(anno));
-			}
+	@Override
+	public Set<Class<?>> scan(String... basePackages) {
+		return scanByAnnotation(basePackages);
+	}
+
+	@Override
+	public Set<Class<?>> scanAssignableType(String basePackages, Class<?>... targetType) {
+		return scanAssignableType(StringUtils.tokenizeToStringArray(basePackages, ",; \t\n"), targetType);
+	}
+
+	@Override
+	public Set<Class<?>> scanAssignableType(String[] basePackages, Class<?>... targetType) {
+		Set<AssignableTypeFilter> typeFilters = Arrays.stream(targetType)
+				.map(AssignableTypeFilter::new)
+				.collect(Collectors.toSet());
+		return scanFilter(basePackages, typeFilters);
+	}
+
+	@Override
+	public Set<Class<?>> scanByAnnotation(String basePackages, Class<? extends Annotation>... annotations) {
+		return scanByAnnotation(StringUtils.tokenizeToStringArray(basePackages, ",; \t\n"), annotations);
+	}
+
+	@Override
+	public Set<Class<?>> scanByAnnotation(String[] basePackages, Class<? extends Annotation>... annotations) {
+		Set<AnnotationTypeFilter> typeFilters = Arrays.stream(annotations)
+				.map(AnnotationTypeFilter::new)
+				.collect(Collectors.toSet());
+		return scanFilter(basePackages, typeFilters);
+	}
+
+
+	protected Set<Class<?>> scanFilter(String[] basePackages, Iterable<? extends TypeFilter> includeFilters){
+		SpringClassScanner cs = new SpringClassScanner();
+
+		for (TypeFilter typeFilter : includeFilters) {
+			cs.addIncludeFilter(typeFilter);
+		}
+
+		if(this.includeFilters.size()>0){
+			this.includeFilters.forEach(cs::addIncludeFilter);
+		}
+
+		if(this.excludeFilters.size()>0){
+			this.excludeFilters.forEach(cs::addExcludeFilter);
 		}
 
 		Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -49,11 +85,6 @@ public class SpringClassScaner implements ResourceLoaderAware, ClassScaner {
 		return classes;
 	}
 
-
-	@Override
-	public Set<Class<?>> scan(String basePackages, Class<? extends Annotation>... annotations) {
-		return scan(StringUtils.tokenizeToStringArray(basePackages, ",; \t\n"), annotations);
-	}
 
 	public final ResourceLoader getResourceLoader() {
 		return this.resourcePatternResolver;
