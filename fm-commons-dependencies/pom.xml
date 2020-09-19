@@ -28,6 +28,11 @@
                 <artifactId>fm-http-commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.saleson</groupId>
+                <artifactId>fm-http-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.github.saleson</groupId>
@@ -44,6 +49,21 @@
             <dependency>
                 <groupId>com.github.saleson</groupId>
                 <artifactId>fm-performance-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.saleson</groupId>
+                <artifactId>fm-web-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.saleson</groupId>
+                <artifactId>fm-basic-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.saleson</groupId>
+                <artifactId>fm-security-commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

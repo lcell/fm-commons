@@ -18,6 +18,10 @@
         <module>fm-aop-commons</module>
         <module>fm-shardingjdbc-commons</module>
         <module>fm-commons-dependencies</module>
+        <module>fm-web-commons</module>
+        <module>fm-basic-commons</module>
+        <module>fm-security-commons</module>
+        <module>fm-http-agent</module>
     </modules>
 
     <properties>
@@ -35,6 +39,7 @@
         <shardingsphere.version>4.0.1</shardingsphere.version>
         <javax-servlet.version>3.1.0</javax-servlet.version>
         <junit.version>4.12</junit.version>
+        <fasterxml-jackson.version>2.11.2</fasterxml-jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -77,6 +82,12 @@
                 <groupId>org.apache.shardingsphere</groupId>
                 <artifactId>sharding-spring-boot-util</artifactId>
                 <version>${shardingsphere.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${fasterxml-jackson.version}</version>
+                <optional>true</optional>
             </dependency>
 
             <dependency>
