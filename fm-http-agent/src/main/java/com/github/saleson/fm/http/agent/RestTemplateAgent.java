@@ -1,13 +1,18 @@
 package com.github.saleson.fm.http.agent;
 
+import com.github.saleson.fm.commons.web.WebUtils;
 import com.github.saleson.fm.http.domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -20,8 +25,28 @@ public class RestTemplateAgent implements HttpAgent {
     private RestTemplate rest;
 
 
+    public static RestTemplate getInstance(String charset) {
+        RestTemplate restTemplate = new RestTemplate();
+        setDefaultCharset(restTemplate, charset);
+        return restTemplate;
+    }
+
+    private static void setDefaultCharset(RestTemplate restTemplate, String charset){
+        List<HttpMessageConverter<?>> list = restTemplate.getMessageConverters();
+        for (HttpMessageConverter<?> httpMessageConverter : list) {
+            if (httpMessageConverter instanceof AbstractHttpMessageConverter) {
+                ((AbstractHttpMessageConverter) httpMessageConverter).setDefaultCharset(Charset.forName(charset));
+            }
+        }
+    }
+
+    public RestTemplateAgent() {
+        this("");
+    }
+
+
     public RestTemplateAgent(String baseUrl) {
-        this(baseUrl, new RestTemplate());
+        this(baseUrl, getInstance(WebUtils.CHARSET_UTF8));
     }
 
 
@@ -31,6 +56,7 @@ public class RestTemplateAgent implements HttpAgent {
         requestFactory.setConnectTimeout((int) timeout);
         requestFactory.setReadTimeout((int) timeout);
         this.rest = new RestTemplate(requestFactory);
+        setDefaultCharset(this.rest, WebUtils.CHARSET_UTF8);
     }
 
     public RestTemplateAgent(String baseUrl, RestTemplate rest) {
